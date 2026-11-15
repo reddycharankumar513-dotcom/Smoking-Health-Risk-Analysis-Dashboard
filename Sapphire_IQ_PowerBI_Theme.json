@@ -1,0 +1,58 @@
+{
+  "name": "Sapphire IQ Healthcare Analytics",
+  "dataColors": [
+    "#17365D",
+    "#00A6A6",
+    "#4C78A8",
+    "#F2A541",
+    "#7A5195",
+    "#2F9C75",
+    "#D45087",
+    "#8C9AA8"
+  ],
+  "background": "#F5F7FA",
+  "foreground": "#17365D",
+  "tableAccent": "#00A6A6",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "title": [
+          {
+            "show": true,
+            "fontFace": "Aptos",
+            "fontSize": 14,
+            "color": {
+              "solid": {
+                "color": "#17365D"
+              }
+            }
+          }
+        ],
+        "labels": [
+          {
+            "color": {
+              "solid": {
+                "color": "#334155"
+              }
+            },
+            "fontFace": "Aptos"
+          }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#F5F7FA"
+              }
+            },
+            "transparency": 0
+          }
+        ]
+      }
+    }
+  }
+}

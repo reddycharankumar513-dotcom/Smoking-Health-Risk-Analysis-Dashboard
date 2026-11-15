@@ -1,0 +1,100 @@
+-- SAPPHIRE IQ | SMOKING AND HEALTH ANALYSIS
+-- Import Smoking_Health_Analysis.csv and rename the table to Patients.
+-- Create each calculated column via Table tools > New column.
+-- Create each measure via Table tools > New measure.
+
+-- CALCULATED COLUMNS
+Age Group =
+SWITCH(
+    TRUE(),
+    Patients[Age] >= 18 && Patients[Age] <= 29, "18-29",
+    Patients[Age] <= 44, "30-44",
+    Patients[Age] <= 59, "45-59",
+    Patients[Age] >= 60, "60+",
+    "Unclassified"
+)
+
+Age Group Sort =
+SWITCH(Patients[Age Group], "18-29", 1, "30-44", 2, "45-59", 3, "60+", 4, 5)
+
+BP Risk Category =
+SWITCH(
+    TRUE(),
+    Patients[Systolic_BP_mmHg] < 120 && Patients[Diastolic_BP_mmHg] < 80, "Lower Range",
+    Patients[Systolic_BP_mmHg] >= 120 && Patients[Systolic_BP_mmHg] <= 129 && Patients[Diastolic_BP_mmHg] < 80, "Elevated",
+    Patients[Systolic_BP_mmHg] >= 130 || Patients[Diastolic_BP_mmHg] >= 80, "High",
+    "Unclassified"
+)
+
+Smoking Exposure Duration =
+SWITCH(
+    TRUE(),
+    Patients[Years_Smoking] = 0, "No recorded years",
+    Patients[Years_Smoking] <= 10, "1-10 years",
+    Patients[Years_Smoking] <= 20, "11-20 years",
+    Patients[Years_Smoking] > 20, "21+ years",
+    "Unclassified"
+)
+
+Smoking Exposure Sort =
+SWITCH(
+    Patients[Smoking Exposure Duration],
+    "No recorded years", 1,
+    "1-10 years", 2,
+    "11-20 years", 3,
+    "21+ years", 4,
+    5
+)
+
+Organ Status =
+IF(Patients[Diagnosed_Organ] = "No Recorded Organ Condition", "Not Recorded", "Recorded")
+
+Condition Status =
+IF(Patients[Health_Condition] = "No Diagnosed Condition", "No Condition Recorded", "Condition Recorded")
+
+-- MEASURES
+Total Patients = DISTINCTCOUNT(Patients[Patient_ID])
+
+Current Smokers =
+CALCULATE([Total Patients], Patients[Smoking_Status] = "Current Smoker")
+
+Patients with Recorded Organ =
+CALCULATE([Total Patients], Patients[Organ Status] = "Recorded")
+
+Patients with Health Conditions =
+CALCULATE([Total Patients], Patients[Condition Status] = "Condition Recorded")
+
+Average Cigarettes per Day =
+AVERAGE(Patients[Cigarettes_Per_Day])
+
+Average Cigarettes per Day - Current Smokers =
+CALCULATE(
+    AVERAGE(Patients[Cigarettes_Per_Day]),
+    Patients[Smoking_Status] = "Current Smoker"
+)
+
+Average Cholesterol =
+AVERAGE(Patients[Total_Cholesterol_mg_dL])
+
+Average Systolic BP = AVERAGE(Patients[Systolic_BP_mmHg])
+
+Average Diastolic BP = AVERAGE(Patients[Diastolic_BP_mmHg])
+
+Current Smoker Percentage =
+DIVIDE([Current Smokers], [Total Patients], 0)
+
+Health Condition Percentage =
+DIVIDE([Patients with Health Conditions], [Total Patients], 0)
+
+-- REPORT VISUAL FIELD MAPPING
+-- KPI cards: [Total Patients], [Current Smokers],
+-- [Patients with Recorded Organ], [Patients with Health Conditions]
+-- Donut: Legend Smoking_Status; Values Count of Patient_ID
+-- Column: Axis Smoking_Status; Values [Average Cigarettes per Day]
+-- Bar: Axis Diagnosed_Organ; Values Count of Patient_ID; filter out
+-- "No Recorded Organ Condition"
+-- Column: Axis BP Risk Category; Values [Average Cholesterol]
+-- Column: Axis Age Group; Values [Current Smokers]
+-- Stacked column: Axis Smoking Exposure Duration; Legend Health_Condition;
+-- Values Count of Patient_ID
+-- Slicers: Gender, Region, Age Group, Smoking_Status, Diagnosis_Date
